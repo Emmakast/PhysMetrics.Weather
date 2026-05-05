@@ -77,21 +77,18 @@ The tool is pre-configured to stream data directly from the public
 buckets.  **No files need to be downloaded** — xarray reads only the slices it
 needs over the network.
 
-Running the command below evaluates Aurora predictions against ERA5 for the
+Running the command below evaluates Pangu-Weather predictions against ERA5 for the
 year 2022 using the WB2 default paths:
 
 ```bash
-uv run physeval-run --year 2022 --model aurora --output results/aurora_2022.csv
+uv run physeval-run --year 2022 --model pangu \
+  --prediction-zarr gs://weatherbench2/datasets/pangu/2018-2022_0012_0p25.zarr \
+  --output results/pangu_2022.csv
 ```
 
 Other models that are already in WB2:
 
 ```bash
-# Pangu-Weather
-uv run physeval-run --model pangu \
-  --prediction-zarr gs://weatherbench2/datasets/pangu/2018-2022_0012_0p25.zarr \
-  --year 2022 --output results/pangu_2022.csv
-
 # GraphCast
 uv run physeval-run --model graphcast \
   --prediction-zarr gs://weatherbench2/datasets/graphcast/2020/date_range_2019-11-16_2021-02-01_12_hours_derived.zarr \
@@ -152,10 +149,11 @@ you can override it with `--ref-zarr`.
 
 ```bash
 uv run physeval-run \
-  --model aurora \
+  --model pangu \
+  --prediction-zarr gs://weatherbench2/datasets/pangu/2018-2022_0012_0p25.zarr \
   --year 2022 \
   --workers 8 \
-  --output results/physics_evaluation_aurora_2022.csv
+  --output results/physics_evaluation_pangu_2022.csv
 ```
 
 Key options:
@@ -172,6 +170,7 @@ Key options:
 | `--lead-times` | `12h,5d,10d` | Comma-separated lead times to evaluate |
 | `--workers` | 16 | Number of parallel workers |
 | `--output` | auto | Output CSV path |
+| `--extended-spectra` | off | Also compute the q spectrum and the KE spectrum at 850 hPa (in addition to the default 500 hPa KE spectrum) |
 | `--quiet` | off | Suppress progress output |
 
 ### 2. Plot results
@@ -243,3 +242,10 @@ date,lead_time_hours,metric_name,model_value,era5_value,n_levels,sp_method
 
 All Python dependencies are pinned in `uv.lock` and installed automatically
 by `uv sync`.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
