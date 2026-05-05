@@ -35,10 +35,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-# Companion library (same directory)
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-from physics_metrics import (
+from .physics_metrics import (
     compute_conservation_scalars,
     compute_drift_percentages,
     compute_drift_slope,
