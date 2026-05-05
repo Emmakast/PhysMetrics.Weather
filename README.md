@@ -50,11 +50,15 @@ After installation the following commands are available on your `PATH`:
 
 | Command | Purpose |
 |---|---|
-| `wb-eval` | Run physics evaluation and produce a CSV of metrics |
-| `wb-spectrum` | Compute kinetic-energy / moisture spectra |
-| `wb-summarize` | Aggregate per-date CSV into a summary table |
-| `wb-plot-ts` | Plot timeseries of conservation metrics |
-| `wb-plot-table` | Render colour-coded comparison tables |
+| `physeval-run` | Run physics evaluation and produce a CSV of metrics |
+| `physeval-plot` | Generate all plots from evaluation CSVs |
+
+You can also invoke them without activating the environment:
+
+```bash
+uv run physeval-run --help
+uv run physeval-plot --help
+```
 
 ### Alternative: plain pip
 
@@ -77,19 +81,19 @@ Running the command below evaluates Aurora predictions against ERA5 for the
 year 2022 using the WB2 default paths:
 
 ```bash
-wb-eval --year 2022 --model aurora --output results/aurora_2022.csv
+uv run physeval-run --year 2022 --model aurora --output results/aurora_2022.csv
 ```
 
 Other models that are already in WB2:
 
 ```bash
 # Pangu-Weather
-wb-eval --model pangu \
+uv run physeval-run --model pangu \
   --prediction-zarr gs://weatherbench2/datasets/pangu/2018-2022_0012_0p25.zarr \
   --year 2022 --output results/pangu_2022.csv
 
 # GraphCast
-wb-eval --model graphcast \
+uv run physeval-run --model graphcast \
   --prediction-zarr gs://weatherbench2/datasets/graphcast/2020/date_range_2019-11-16_2021-02-01_12_hours_derived.zarr \
   --year 2020 --output results/graphcast_2020.csv
 ```
@@ -100,18 +104,28 @@ Point `--prediction-zarr` at **any Zarr store** — local or remote:
 
 ```bash
 # Local Zarr directory
-wb-eval --model my_model \
+uv run physeval-run --model my_model \
   --prediction-zarr /data/my_model_forecasts.zarr \
   --output results/my_model_2022.csv
 
 # S3
-wb-eval --model my_model \
+uv run physeval-run --model my_model \
   --prediction-zarr s3://my-bucket/forecasts.zarr \
   --output results/my_model_2022.csv
 
 # Custom GCS bucket
-wb-eval --model my_model \
+uv run physeval-run --model my_model \
   --prediction-zarr gs://my-bucket/forecasts.zarr \
+  --output results/my_model_2022.csv
+```
+
+You can also supply your own reference dataset instead of ERA5:
+
+```bash
+uv run physeval-run --model my_model \
+  --prediction-zarr /data/my_model_forecasts.zarr \
+  --reference ifs \
+  --ref-zarr gs://weatherbench2/datasets/hres_t0/2016-2022-6h-1440x721.zarr \
   --output results/my_model_2022.csv
 ```
 
@@ -128,7 +142,7 @@ variables (or common aliases):
 | Geopotential (pressure levels) | `geopotential`, `z` |
 
 The ERA5 reference is always read from the public WB2 bucket by default;
-you can override it with `--era5-zarr`.
+you can override it with `--ref-zarr`.
 
 ---
 
@@ -137,7 +151,7 @@ you can override it with `--era5-zarr`.
 ### 1. Evaluate a model
 
 ```bash
-wb-eval \
+uv run physeval-run \
   --model aurora \
   --year 2022 \
   --workers 8 \
@@ -151,56 +165,65 @@ Key options:
 | `--year` | 2022 | Year to evaluate |
 | `--dates` | — | Evaluate specific dates, e.g. `2022-01-01 2022-02-01` |
 | `--month` | — | Evaluate a full month, e.g. `2022-06` |
-| `--model` | `aurora` | Model name (used in the output filename) |
+| `--model` | `model` | Model name (used in the output filename) |
 | `--prediction-zarr` | Aurora WB2 path | Zarr store for the model predictions |
-| `--era5-zarr` | ERA5 WB2 path | Zarr store for the ERA5 reference |
+| `--ref-zarr` | ERA5 WB2 path | Zarr store for the reference dataset |
 | `--reference` | `era5` | Use `era5` or `ifs` (IFS HRES t=0) as the reference |
 | `--lead-times` | `12h,5d,10d` | Comma-separated lead times to evaluate |
-| `--workers` | 8 | Number of parallel workers |
+| `--workers` | 16 | Number of parallel workers |
 | `--output` | auto | Output CSV path |
 | `--quiet` | off | Suppress progress output |
 
-### 2. Compute spectra
+### 2. Plot results
 
 ```bash
-wb-spectrum ke \
-  --model aurora \
-  --year 2022 \
-  --prediction-zarr gs://weatherbench2/datasets/aurora/2022-1440x721.zarr \
-  --output results/ke_spectrum_aurora_2022.csv
+uv run physeval-plot \
+  --results-dir results/ \
+  --outdir plots/
 ```
 
-Spectrum types: `ke` (500 hPa kinetic energy), `ke_850hpa`, `q` (moisture).
+Key options:
 
-### 3. Summarize results
+| Flag | Default | Description |
+|---|---|---|
+| `--results-dir` | `../results` | Directory containing evaluation CSVs |
+| `--outdir` | `../plots` | Directory to write plot images |
 
-```bash
-wb-summarize \
-  --input results/physics_evaluation_aurora_2022.csv \
-  --output results/physics_summary_aurora_2022.csv
-```
+---
 
-### 4. Plot timeseries
-
-```bash
-# Single model
-wb-plot-ts single results/physics_evaluation_aurora_2022.csv
-
-# Multi-model overlay (auto-discovers CSVs in results/)
-wb-plot-ts combined --exclude aurora_2022
-```
-
-### 5. Plot summary table
+## SLURM example
 
 ```bash
-wb-plot-table  # auto-discovers summary CSVs and produces one PNG per lead time
+#!/bin/bash
+#SBATCH --job-name=eval_hres
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --time=12:00:00
+
+MODEL="hres"
+YEAR="${YEAR:-2020}"
+WORKERS="${WORKERS:-16}"
+PREDICTION_ZARR="gs://weatherbench2/datasets/hres/2016-2022-0012-1440x721.zarr"
+REF_ZARR="gs://weatherbench2/datasets/hres_t0/2016-2022-6h-1440x721.zarr"
+OUTPUT_CSV="results/physics_evaluation_${MODEL}_${YEAR}.csv"
+
+uv run physeval-run \
+  --model "$MODEL" \
+  --prediction-zarr "$PREDICTION_ZARR" \
+  --reference ifs \
+  --ref-zarr "$REF_ZARR" \
+  --year "$YEAR" \
+  --lead-times "12h,5d,10d" \
+  --workers "$WORKERS" \
+  --output "$OUTPUT_CSV"
 ```
 
 ---
 
 ## Output format
 
-`wb-eval` writes a **long-format CSV**:
+`physeval-run` writes a **long-format CSV**:
 
 ```
 date,lead_time_hours,metric_name,model_value,era5_value,n_levels,sp_method
