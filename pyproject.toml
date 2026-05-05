@@ -1,5 +1,4 @@
 [project]
-name = "physical-consistency-benchmark"
 name = "physeval-weather"
 version = "0.1.0"
 description = "Physics metrics for evaluating AI weather models"
@@ -14,11 +13,6 @@ readme = "README.md"
 ]
 
 [project.scripts]
-wb-eval = "physical_consistency_benchmark.run_physics_evaluation:main"
-wb-spectrum = "physical_consistency_benchmark.run_spectrum:main"
-wb-summarize = "physical_consistency_benchmark.summarize_physics_metrics:main"
-wb-plot-ts = "physical_consistency_benchmark.plot_timeseries:main"
-wb-plot-table = "physical_consistency_benchmark.plot_summary_table:main"
 physeval-run = "physeval_weather.run_all_metrics:main"
 physeval-plot = "physeval_weather.plot_neurips_metrics:main"
 
