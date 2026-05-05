@@ -3,8 +3,6 @@ name = "physeval-weather"
 version = "0.1.0"
 description = "Physics metrics for evaluating AI weather models"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
     "numpy",
     "pandas",
     "xarray",
@@ -12,9 +10,6 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "scipy",
-    "pyshtools",
-    "zarr",
-    "gcsfs",
 ]
 
 [project.scripts]
@@ -26,4 +21,3 @@ packages = ["src/physeval_weather"]
 
 [build-system]
 requires = ["hatchling"]
-build-backend = "hatchling.build"
