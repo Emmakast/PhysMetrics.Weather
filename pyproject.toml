@@ -11,6 +11,8 @@ dependencies = [    "numpy",
     "matplotlib",
     "seaborn",
     "scipy",
+    "zarr", 
+    "gcsfs"
 ]
 
 [project.scripts]
