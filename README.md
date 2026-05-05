@@ -1,8 +1,7 @@
-# PhysBench
+# PhysEval.Weather
 
-A benchmark toolkit for evaluating the **physical consistency** of AI weather
-forecast models.  It computes eight physics-based diagnostic metrics against an
-ERA5 or IFS HRES reference dataset and generates publication-quality plots and
+A toolkit for evaluating the **physical consistency** of Machine Learning Weather Prediction models.  It computes nine physics-based diagnostic metrics against an
+ERA5 or IFS HRES reference dataset and generates plots and
 summary tables.
 
 ---
@@ -15,10 +14,11 @@ summary tables.
 | **Water Mass drift** | Is global water-vapour mass conserved? |
 | **Total Energy drift** | Is global total energy conserved? |
 | **Effective Resolution** | At what spatial scale does the model lose skill? |
-| **Spectral Divergence** | How much does the kinetic-energy spectrum diverge from ERA5? |
-| **Spectral Residual** | Excess/deficit small-scale energy vs ERA5 |
+| **Spectral Divergence** | How much does the kinetic-energy spectrum diverge from reference data? |
+| **Spectral Residual** | Excess/deficit small-scale energy vs reference data |
 | **Hydrostatic Balance** | How well does the model satisfy hydrostatic balance? |
 | **Geostrophic Balance** | How well does the model satisfy geostrophic balance? |
+| **Lapse Rate** | How much does the lapse rate distribution diverge from the reference data? |
 
 Metrics are computed at multiple forecast lead times (default: 12 h, 5 days,
 10 days) and written to a long-format CSV for downstream analysis.
@@ -35,8 +35,8 @@ dependency management.
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 2. Clone the repository
-git clone https://github.com/Emmakast/Physical-consistency-benchmark.git
-cd Physical-consistency-benchmark
+git clone https://github.com/Emmakast/PhysEval.Weather.git
+cd PhysEval.Weather
 
 # 3. Create a virtual environment and install all dependencies
 uv sync
