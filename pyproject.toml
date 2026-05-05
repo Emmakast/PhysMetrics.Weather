@@ -3,6 +3,7 @@ name = "physeval-weather"
 version = "0.1.0"
 description = "Physics metrics for evaluating AI weather models"
 readme = "README.md"
+license = { text = "MIT" }
     "numpy",
     "pandas",
     "xarray",
