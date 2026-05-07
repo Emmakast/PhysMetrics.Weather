@@ -1,6 +1,6 @@
 # PhysEval.Weather
 
-A toolkit for evaluating the **physical consistency** of Machine Learning Weather Prediction models.  It computes nine physics-based diagnostic metrics against an
+An open-source, unified framework for evaluating the **physical consistency** of Machine Learning Weather Prediction (MLWP) models.  It computes nine physics-based diagnostic metrics against an
 ERA5 or IFS HRES reference dataset and generates plots and
 summary tables.
 
@@ -45,6 +45,7 @@ uv sync
 source .venv/bin/activate   # Linux / macOS
 # .venv\Scripts\activate    # Windows
 ```
+**NOTE:** this uv installation does not work for the anonymized GitHub.
 
 After installation the following commands are available on your `PATH`:
 
@@ -72,7 +73,7 @@ pip install -e .
 
 ### Option A — use WeatherBench 2 data (no download required)
 
-The tool is pre-configured to stream data directly from the public
+The framework is pre-configured to stream data directly from the public
 [WeatherBench 2](https://weatherbench2.readthedocs.io/) Google Cloud Storage
 buckets.  **No files need to be downloaded** — xarray reads only the slices it
 needs over the network.
@@ -116,7 +117,7 @@ uv run physeval-run --model my_model \
   --output results/my_model_2022.csv
 ```
 
-You can also supply your own reference dataset instead of ERA5:
+You can also supply your own reference dataset instead of ERA5 (e.g., the IFS HRES analysis):
 
 ```bash
 uv run physeval-run --model my_model \
@@ -164,7 +165,7 @@ Key options:
 | `--dates` | — | Evaluate specific dates, e.g. `2022-01-01 2022-02-01` |
 | `--month` | — | Evaluate a full month, e.g. `2022-06` |
 | `--model` | `model` | Model name (used in the output filename) |
-| `--prediction-zarr` | Aurora WB2 path | Zarr store for the model predictions |
+| `--prediction-zarr` | WB2 path | Zarr store for the model predictions |
 | `--ref-zarr` | ERA5 WB2 path | Zarr store for the reference dataset |
 | `--reference` | `era5` | Use `era5` or `ifs` (IFS HRES t=0) as the reference |
 | `--lead-times` | `12h,5d,10d` | Comma-separated lead times to evaluate |
