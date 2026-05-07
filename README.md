@@ -45,7 +45,7 @@ uv sync
 source .venv/bin/activate   # Linux / macOS
 # .venv\Scripts\activate    # Windows
 ```
-**NOTE:** this uv installation does not work for the anonymized GitHub.
+**NOTE:** this uv installation does not work for an anonymized GitHub. To still allow for easy verification of the code, there is a Notebook folder containing plots.
 
 After installation the following commands are available on your `PATH`:
 
